@@ -1,8 +1,13 @@
 # space-elevator
 
+[![CI](https://github.com/EwigMidori/space-elevator/actions/workflows/ci.yml/badge.svg)](https://github.com/EwigMidori/space-elevator/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+
 `space-elevator` is a portable PM harness for multi-agent PDCA execution in any repository.
 
 The package ships a vendorable `_pm/` template and a small CLI that installs that template into another repository root.
+
+It is designed for repositories that want a durable local source of truth for roadmap state, agent rulebooks, spec-review gates, and unattended architect wakeups.
 
 ## What It Contains
 
@@ -17,6 +22,7 @@ The package ships a vendorable `_pm/` template and a small CLI that installs tha
 From this repository:
 
 ```bash
+PYTHONPATH=src python3 -m space_elevator --version
 PYTHONPATH=src python3 -m space_elevator.cli init /path/to/your/repo
 ```
 
@@ -24,6 +30,13 @@ After publishing:
 
 ```bash
 uv tool run --from git+https://github.com/ewigmidori/space-elevator space-elevator init /path/to/your/repo
+```
+
+Or install the tool persistently:
+
+```bash
+uv tool install git+https://github.com/ewigmidori/space-elevator
+space-elevator init /path/to/your/repo
 ```
 
 ## CLI
@@ -46,6 +59,8 @@ Choose another destination directory name:
 PYTHONPATH=src python3 -m space_elevator.cli init . --pm-dir ops-pm
 ```
 
+The installer also creates `<repo-root>/.tmp/.gitignore` when it is missing.
+
 ## Consuming The Template
 
 The installed template expects:
@@ -66,12 +81,24 @@ python3 _pm/scripts/propeller.py
 
 - `src/space_elevator/cli.py`
   Initialization CLI.
+- `src/space_elevator/__main__.py`
+  `python -m space_elevator` entrypoint.
 - `src/space_elevator/template/_pm/`
   The vendorable harness template.
+- `tests/`
+  Basic offline validation for the CLI installer.
+
+## Development
+
+Offline validation used in this repository:
+
+```bash
+PYTHONPATH=src python3 -m unittest discover -s tests -p 'test_*.py'
+python3 -m py_compile src/space_elevator/*.py
+```
 
 ## Publish Notes
 
 This repository is prepared for GitHub publication as `ewigmidori/space-elevator`.
 
-The local environment used to build this extraction has no outbound network access, so the actual GitHub repo creation and first push still need to happen from a network-enabled shell.
-That same restriction also prevents validating `uv run space-elevator ...` here, because the isolated build environment cannot fetch `hatchling` from PyPI. The package metadata is ready for a normal network-enabled `uv` workflow.
+The local environment used to harden this extraction had no outbound PyPI access, so `uv run space-elevator ...` could not be validated through an isolated build backend here because `hatchling` could not be fetched. The package metadata is still prepared for a normal network-enabled `uv` workflow.

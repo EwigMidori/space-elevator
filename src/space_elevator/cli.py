@@ -6,11 +6,18 @@ import sys
 from importlib.resources import as_file, files
 from pathlib import Path
 
+from space_elevator import __version__
+
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         prog="space-elevator",
         description="Install the portable `_pm` harness into another repository.",
+    )
+    parser.add_argument(
+        "--version",
+        action="version",
+        version=f"%(prog)s {__version__}",
     )
     subparsers = parser.add_subparsers(dest="command", required=True)
 
@@ -63,6 +70,17 @@ def install_template(target_root: Path, pm_dir: str, force: bool) -> Path:
     return destination
 
 
+def ensure_tmp_gitignore(target_root: Path) -> Path:
+    tmp_dir = target_root / ".tmp"
+    gitignore_path = tmp_dir / ".gitignore"
+
+    tmp_dir.mkdir(parents=True, exist_ok=True)
+    if not gitignore_path.exists():
+        gitignore_path.write_text("*\n!.gitignore\n", encoding="utf-8")
+
+    return gitignore_path
+
+
 def cmd_init(args: argparse.Namespace) -> int:
     target_root = Path(args.target).resolve()
     if not target_root.exists():
@@ -78,11 +96,12 @@ def cmd_init(args: argparse.Namespace) -> int:
         print(f"error: {exc}", file=sys.stderr)
         return 1
 
+    gitignore_path = ensure_tmp_gitignore(target_root)
     print(f"installed `_pm` template to {destination}")
     print("next steps:")
     print(f"  1. inspect {destination / 'progress.json'}")
     print(f"  2. adjust {destination / 'AGENTS.md'} to fit the repository")
-    print(f"  3. create {target_root / '.tmp'} and keep it locally ignored")
+    print(f"  3. review {gitignore_path} and keep `.tmp/` local-only")
     return 0
 
 
@@ -95,4 +114,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

@@ -12,6 +12,9 @@ license = "MIT"
 authors = [
   { name = "ewigmidori" }
 ]
+maintainers = [
+  { name = "ewigmidori" }
+]
 keywords = ["agents", "automation", "codex", "project-management", "workflow"]
 classifiers = [
   "Development Status :: 3 - Alpha",
@@ -31,6 +34,7 @@ dependencies = []
 Homepage = "https://github.com/ewigmidori/space-elevator"
 Repository = "https://github.com/ewigmidori/space-elevator"
 Issues = "https://github.com/ewigmidori/space-elevator/issues"
+Changelog = "https://github.com/ewigmidori/space-elevator/blob/main/CHANGELOG.md"
 
 [project.scripts]
 space-elevator = "space_elevator.cli:main"
@@ -46,3 +50,15 @@ include = [
 [tool.hatch.build.targets.wheel]
 packages = ["src/space_elevator"]
 
+[tool.hatch.build.targets.sdist]
+include = [
+  "/src",
+  "/tests",
+  "/README.md",
+  "/LICENSE",
+  "/CHANGELOG.md",
+  "/CONTRIBUTING.md",
+  "/PUBLISHING.md",
+  "/pyproject.toml",
+  "/uv.lock",
+]
