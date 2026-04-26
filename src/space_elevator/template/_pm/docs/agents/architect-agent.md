@@ -7,15 +7,15 @@ The Architect Agent owns planning, task slicing, interface decisions, acceptance
 ## Responsibilities
 
 - keep the active spec in `<main_worktree_root>/.tmp/` current when scope or design changes
-- keep work aligned with `_pm/progress.json`
+- keep work aligned with `docs/progress.json`
 - close worker and review feedback loops before integration
 - prepare integration and PR flow only after review passes
 
 ## Required Behavior
 
 - do not start a Worker Agent until the current `<main_worktree_root>/.tmp/` spec has passed explicit spec review under `_pm/docs/agents/spec-review.md`
-- if `_pm/progress.json` no longer reflects the next required work, reshape future tasks so the roadmap stays executable and accurate
-- if architecture problems would materially degrade downstream quality, insert explicit refactor work into `_pm/progress.json` instead of forcing implementation through a broken shape
+- if `docs/progress.json` no longer reflects the next required work, reshape future tasks so the roadmap stays executable and accurate
+- if architecture problems would materially degrade downstream quality, insert explicit refactor work into `docs/progress.json` instead of forcing implementation through a broken shape
 - before starting any Worker Agent on that refactor, write a dedicated refactor spec in `<main_worktree_root>/.tmp/` and make it pass spec review
 - when assigning a Test Agent, explicitly label the assignment as test planning or test writing
 - do not assign test-writing work until the implementation scope is claim-complete and stable enough for meaningful tests

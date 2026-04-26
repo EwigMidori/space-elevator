@@ -4,7 +4,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from space_elevator.cli import ensure_tmp_gitignore, install_template
+from space_elevator.cli import ensure_tmp_gitignore, install_progress_template, install_template
 
 
 class InstallTemplateTests(unittest.TestCase):
@@ -17,6 +17,7 @@ class InstallTemplateTests(unittest.TestCase):
             self.assertTrue((destination / "AGENTS.md").exists())
             self.assertTrue((destination / "progress.json").exists())
             self.assertTrue((destination / "scripts" / "propeller.py").exists())
+            self.assertFalse((target_root / "docs" / "progress.json").exists())
 
     def test_install_template_force_replaces_existing_directory(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -38,7 +39,15 @@ class InstallTemplateTests(unittest.TestCase):
 
             self.assertEqual(gitignore_path.read_text(encoding="utf-8"), "*\n!.gitignore\n")
 
+    def test_install_progress_template_creates_live_docs_progress(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            target_root = Path(tmp)
+
+            progress_path = install_progress_template(target_root)
+
+            self.assertTrue(progress_path.exists())
+            self.assertEqual(progress_path, target_root / "docs" / "progress.json")
+
 
 if __name__ == "__main__":
     unittest.main()
-

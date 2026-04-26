@@ -5,7 +5,7 @@ These documents are the binding rule set for agent-driven work under `_pm`.
 Use them together with:
 
 - `_pm/AGENTS.md`
-- `_pm/progress.json`
+- `docs/progress.json`
 - the current batch spec under `<main_worktree_root>/.tmp/`
 
 Rule documents:

@@ -15,7 +15,8 @@ It is designed for repositories that want a durable local source of truth for ro
 - A roadmap schema checker
 - A local roadmap viewer
 - `propeller.py`, an unattended architect watcher for Codex-driven execution
-- Agent rulebooks, scoring rules, and the default Playdex roadmap snapshot used during development
+- Agent rulebooks and scoring rules under `_pm/`
+- A minimal live-roadmap starter for `docs/progress.json`
 
 ## Install Or Run With `uv`
 
@@ -60,12 +61,14 @@ PYTHONPATH=src python3 -m space_elevator.cli init . --pm-dir ops-pm
 ```
 
 The installer also creates `<repo-root>/.tmp/.gitignore` when it is missing.
+If `docs/progress.json` is missing, the installer also creates it from the bundled starter template.
 
 ## Consuming The Template
 
 The installed template expects:
 
 - the copied directory to live at `<repo-root>/_pm/`
+- the live mutable roadmap to live at `<repo-root>/docs/progress.json`
 - active batch specs to live at `<main_worktree_root>/.tmp/`
 - local git ignore rules to permit `/.tmp/` scratch state
 
@@ -76,6 +79,11 @@ python3 _pm/scripts/check_progress_schema.py
 python3 _pm/scripts/view_progress.py
 python3 _pm/scripts/propeller.py
 ```
+
+Inside the vendored harness:
+
+- `_pm/progress.json` is only a minimal starter template kept with the harness.
+- `docs/progress.json` is the real mutable roadmap that agents should read and update.
 
 ## Repository Layout
 

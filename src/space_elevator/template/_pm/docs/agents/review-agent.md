@@ -9,7 +9,7 @@ The Review Agent owns spec review, implementation review, and completion scoring
 - `_pm/docs/review-scoring.md`
 - `_pm/docs/agents/spec-review.md`
 - `_pm/AGENTS.md`
-- `_pm/progress.json`
+- `docs/progress.json`
 - the current `.tmp/` spec
 - the local upstream source, design doc, or reference implementation explicitly named by the task when one exists
 

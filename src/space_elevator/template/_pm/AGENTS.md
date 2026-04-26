@@ -6,11 +6,12 @@ Its purpose is simple: prevent AI agents and developers from placing work in the
 
 ## Roadmap Source Of Truth
 
-- The execution roadmap lives in `_pm/progress.json`.
-- Before starting any substantial implementation, refactor, or cross-boundary change, read `_pm/progress.json`.
-- AI agents must align proposed work with the current phase, task dependencies, and gate conditions in `_pm/progress.json`.
-- Do not invent a parallel roadmap in comments, commit messages, or ad hoc notes when `_pm/progress.json` already covers the plan.
-- If implementation reveals that the roadmap is wrong, update `_pm/progress.json` first or alongside the code change so planning and execution stay synchronized.
+- The execution roadmap lives in `docs/progress.json`.
+- `_pm/progress.json` is only the vendorable starter template kept with the harness.
+- Before starting any substantial implementation, refactor, or cross-boundary change, read `docs/progress.json`.
+- AI agents must align proposed work with the current phase, task dependencies, and gate conditions in `docs/progress.json`.
+- Do not invent a parallel roadmap in comments, commit messages, or ad hoc notes when `docs/progress.json` already covers the plan.
+- If implementation reveals that the roadmap is wrong, update `docs/progress.json` first or alongside the code change so planning and execution stay synchronized.
 
 ## Execution Workflow Source Of Truth
 
@@ -92,11 +93,11 @@ This repository uses a feedback-driven PDCA workflow for substantial implementat
 
 ## Progress Status Authority
 
-- `_pm/progress.json` is review-gated.
+- `docs/progress.json` is review-gated.
 - Review scoring and acceptance thresholds are defined in `_pm/docs/review-scoring.md`.
 - Worker Agents must never mark any task or phase as `done`.
 - The Architect Agent must never unilaterally mark any task or phase as `done` based on implementation alone.
-- The Architect Agent may restructure future roadmap items in `_pm/progress.json` when the existing task list no longer matches the required next work, but that authority does not include marking any task or phase as `done`.
+- The Architect Agent may restructure future roadmap items in `docs/progress.json` when the existing task list no longer matches the required next work, but that authority does not include marking any task or phase as `done`.
 - Only a Review Agent may mark a progress item complete, and only after a real review concludes that the item meets the acceptance bar.
 - `ready_for_review` is allowed before completion; `done` is not.
 - Completion requires a review quality score of `95` or higher.
@@ -159,7 +160,7 @@ smoke tests
 - Durable PM rules live in `_pm/`.
 - Active specs, temporary planning material, local research, and scratch copies live under `<main_worktree_root>/.tmp/`.
 - `.tmp/` should be locally ignored from git tracking.
-- When code changes alter roadmap assumptions or delivery sequencing, update `_pm/progress.json` together with the implementation.
+- When code changes alter roadmap assumptions or delivery sequencing, update `docs/progress.json` together with the implementation.
 
 ## Validation Workflow
 

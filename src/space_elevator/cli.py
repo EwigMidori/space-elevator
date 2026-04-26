@@ -45,14 +45,14 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def template_root() -> Path:
-    resource = files("space_elevator").joinpath("template", "_pm")
+def template_root(*parts: str) -> Path:
+    resource = files("space_elevator").joinpath("template", *parts)
     with as_file(resource) as path:
         return path
 
 
 def install_template(target_root: Path, pm_dir: str, force: bool) -> Path:
-    source_root = template_root()
+    source_root = template_root("_pm")
     destination = target_root / pm_dir
 
     if destination.exists():
@@ -67,6 +67,18 @@ def install_template(target_root: Path, pm_dir: str, force: bool) -> Path:
 
     destination.parent.mkdir(parents=True, exist_ok=True)
     shutil.copytree(source_root, destination)
+    return destination
+
+
+def install_progress_template(target_root: Path) -> Path:
+    source_path = template_root("docs", "progress.json")
+    docs_dir = target_root / "docs"
+    destination = docs_dir / "progress.json"
+
+    docs_dir.mkdir(parents=True, exist_ok=True)
+    if not destination.exists():
+        shutil.copy2(source_path, destination)
+
     return destination
 
 
@@ -96,12 +108,14 @@ def cmd_init(args: argparse.Namespace) -> int:
         print(f"error: {exc}", file=sys.stderr)
         return 1
 
+    progress_path = install_progress_template(target_root)
     gitignore_path = ensure_tmp_gitignore(target_root)
     print(f"installed `_pm` template to {destination}")
     print("next steps:")
-    print(f"  1. inspect {destination / 'progress.json'}")
-    print(f"  2. adjust {destination / 'AGENTS.md'} to fit the repository")
-    print(f"  3. review {gitignore_path} and keep `.tmp/` local-only")
+    print(f"  1. inspect {progress_path}")
+    print(f"  2. keep {destination / 'progress.json'} as a minimal starter template only")
+    print(f"  3. adjust {destination / 'AGENTS.md'} to fit the repository")
+    print(f"  4. review {gitignore_path} and keep `.tmp/` local-only")
     return 0
 
 

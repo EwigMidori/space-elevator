@@ -10,7 +10,8 @@ from typing import Any
 
 
 PM_ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_PROGRESS_PATH = PM_ROOT / "progress.json"
+REPO_ROOT = PM_ROOT.parent
+DEFAULT_PROGRESS_PATH = REPO_ROOT / "docs" / "progress.json"
 
 TOP_LEVEL_KEYS = {
     "schema_version",
@@ -71,7 +72,7 @@ def main() -> int:
         "path",
         nargs="?",
         default=str(DEFAULT_PROGRESS_PATH),
-        help="Path to the roadmap JSON file. Defaults to _pm/progress.json.",
+        help="Path to the roadmap JSON file. Defaults to docs/progress.json.",
     )
     args = parser.parse_args()
 

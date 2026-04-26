@@ -7,7 +7,7 @@ This directory is a small project-management harness intended to be copied into 
 - `_pm/AGENTS.md`
   Repository-wide PM and delegation rules.
 - `_pm/progress.json`
-  Phase and task roadmap.
+  Minimal starter template only.
 - `_pm/docs/`
   Agent handbooks and scoring rules.
 - `_pm/scripts/`
@@ -16,6 +16,7 @@ This directory is a small project-management harness intended to be copied into 
 ## Runtime Assumptions
 
 - `_pm` lives directly under the repository root.
+- The live roadmap lives at `<repo-root>/docs/progress.json`.
 - Active batch specs live under `<main_worktree_root>/.tmp/`, not inside ephemeral worktrees.
 - `.tmp/` should be locally ignored. `propeller.py` will try to add `/.tmp/` to `.git/info/exclude` automatically.
 
@@ -29,7 +30,7 @@ python3 _pm/scripts/propeller.py
 
 ## First-Use Checklist
 
-1. Replace the `project` field in `_pm/progress.json`.
-2. Replace the template phases in `_pm/progress.json` with repository-specific work.
+1. Copy or adapt the starter roadmap into `docs/progress.json`.
+2. Replace the template phases in `docs/progress.json` with repository-specific work.
 3. Review `_pm/AGENTS.md` and remove any rules that do not fit this repository's actual workflow.
 4. Confirm `<main_worktree_root>/.tmp/` is locally ignored and available for specs.

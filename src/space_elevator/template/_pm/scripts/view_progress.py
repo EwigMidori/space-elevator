@@ -10,7 +10,8 @@ from urllib.parse import urlparse
 
 
 PM_ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_PROGRESS_PATH = PM_ROOT / "progress.json"
+REPO_ROOT = PM_ROOT.parent
+DEFAULT_PROGRESS_PATH = REPO_ROOT / "docs" / "progress.json"
 DEFAULT_HOST = "127.0.0.1"
 DEFAULT_PORT = 18480
 
@@ -19,13 +20,13 @@ PROGRESS_PATH = DEFAULT_PROGRESS_PATH
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Serve a local HTML view for `_pm/progress.json`."
+        description="Serve a local HTML view for `docs/progress.json`."
     )
     parser.add_argument(
         "--progress-file",
         type=Path,
         default=DEFAULT_PROGRESS_PATH,
-        help="Path to the roadmap JSON file. Defaults to _pm/progress.json.",
+        help="Path to the roadmap JSON file. Defaults to docs/progress.json.",
     )
     parser.add_argument(
         "--host",
@@ -360,7 +361,7 @@ def build_page(port: int) -> str:
     <div class="hero">
       <div class="card hero-main">
         <h1 id="hero-title">Project Progress</h1>
-        <div class="subtitle">A local execution view for <code>_pm/progress.json</code></div>
+        <div class="subtitle">A local execution view for <code>docs/progress.json</code></div>
         <div class="meta">
           <div class="pill"><strong>Project</strong><span id="project"></span></div>
           <div class="pill"><strong>Mode</strong><span id="planning-mode"></span></div>
