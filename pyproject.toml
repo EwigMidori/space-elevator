@@ -1,0 +1,48 @@
+[build-system]
+requires = ["hatchling>=1.27.0"]
+build-backend = "hatchling.build"
+
+[project]
+name = "space-elevator"
+version = "0.1.0"
+description = "A portable PM harness for multi-agent PDCA execution in any repository."
+readme = "README.md"
+requires-python = ">=3.11"
+license = "MIT"
+authors = [
+  { name = "ewigmidori" }
+]
+keywords = ["agents", "automation", "codex", "project-management", "workflow"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Software Development :: Build Tools",
+  "Topic :: Software Development :: Libraries :: Python Modules",
+]
+dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/ewigmidori/space-elevator"
+Repository = "https://github.com/ewigmidori/space-elevator"
+Issues = "https://github.com/ewigmidori/space-elevator/issues"
+
+[project.scripts]
+space-elevator = "space_elevator.cli:main"
+
+[tool.hatch.build]
+include = [
+  "src/space_elevator/**/*.py",
+  "src/space_elevator/template/_pm/**",
+  "README.md",
+  "LICENSE",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/space_elevator"]
+

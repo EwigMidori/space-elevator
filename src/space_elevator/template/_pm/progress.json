@@ -1,0 +1,916 @@
+{
+  "schema_version": 1,
+  "project": "Playdex 课程全链路 Rust 生成系统",
+  "planning_mode": "敏捷迭代",
+  "last_updated": "2026-04-24",
+  "status_model": {
+    "phase_status": [
+      "todo",
+      "in_progress",
+      "blocked",
+      "done"
+    ],
+    "task_status": [
+      "todo",
+      "in_progress",
+      "blocked",
+      "ready_for_review",
+      "done"
+    ]
+  },
+  "execution_rules": {
+    "summary": "以 `L2.pdf` 作为持续集成样本，采用小步快跑、端到端优先、阶段可重跑的敏捷方式推进 Rust 全链路生成系统。",
+    "rules": [
+      "始终保留一条可运行主线，优先让 `coursegen run L2` 逐步变完整，而不是先追求抽象完美。",
+      "每个迭代都必须产出一个可验证增量，至少改进一个真实 stage、校验器或 reviewer 回路。",
+      "不冻结产品能力边界；题型、reviewer、MDX 组件、资产策略都允许在实现过程中增量扩展。",
+      "先稳定产物 schema 与引用校验，再在此基础上持续演进 prompt 和交互能力。",
+      "所有 stage 都要落盘原始输入、渲染 prompt、模型输出、解析结果和验证报告，确保可审计。",
+      "失败优先可恢复；任何 stage 失败后都应支持只重跑该 stage，而不是强制全链路重来。",
+      "对 L2 的开发优先级高于泛化设计；只有在 L2 暴露出真实需求后，才上升为框架能力。",
+      "图片选择、QuestionRef、QuestionFamily、coverageTrace 这类高风险引用必须由程序校验，不能只信模型。",
+      "外部 API 与 LLM 调用都要有速率限制、重试、超时和退避策略，避免 TPS 波动拖垮整条链路。",
+      "Python 现有脚本可作为过渡 oracle；Rust 版本达到同等可用性前，不强行一次性替换全部旧实现。"
+    ]
+  },
+  "workstreams": [
+    {
+      "id": "ws_cli",
+      "name": "CLI 与编排",
+      "scope": [
+        "Rust CLI",
+        "run metadata",
+        "stage orchestration",
+        "resume 与 retry"
+      ]
+    },
+    {
+      "id": "ws_convert",
+      "name": "PDF 转换",
+      "scope": [
+        "MinerU raw API 集成",
+        "stage-1 plain extraction",
+        "artifact normalization"
+      ]
+    },
+    {
+      "id": "ws_prompt",
+      "name": "Prompt 与输入包",
+      "scope": [
+        "prompt loading",
+        "input bundle rendering",
+        "generation context assembly"
+      ]
+    },
+    {
+      "id": "ws_story",
+      "name": "Guided Story 生成",
+      "scope": [
+        "manifest generation",
+        "step JSON generation",
+        "term catalog 与 exercise schema"
+      ]
+    },
+    {
+      "id": "ws_qbank",
+      "name": "题库生成",
+      "scope": [
+        "flashcards",
+        "longform questions",
+        "coverage map 与 references"
+      ]
+    },
+    {
+      "id": "ws_textbook",
+      "name": "课本生成",
+      "scope": [
+        "MDX generation",
+        "componentized content",
+        "image asset selection and copying"
+      ]
+    },
+    {
+      "id": "ws_review",
+      "name": "校验与 Reviewer 回路",
+      "scope": [
+        "schema validation",
+        "cross-reference checks",
+        "coverage checks",
+        "reviewer orchestration"
+      ]
+    },
+    {
+      "id": "ws_devx",
+      "name": "开发体验",
+      "scope": [
+        "config management",
+        "logging",
+        "test fixtures",
+        "golden outputs"
+      ]
+    }
+  ],
+  "milestones": [
+    {
+      "id": "M1",
+      "name": "Rust CLI 能跑通 L2 的 convert stage",
+      "phase": "P1",
+      "done_when": [
+        "`coursegen convert L2` 能读配置并写入 `pipeline/1-plain/L2/`",
+        "run metadata 会写入 Rust 管理的 meta 目录",
+        "失败路径不会泄漏 token 或其他敏感信息"
+      ]
+    },
+    {
+      "id": "M2",
+      "name": "Guided story stage 在 L2 上可用",
+      "phase": "P2",
+      "done_when": [
+        "`coursegen generate guided-story L2` 能产出 manifest 和 steps",
+        "step 文件能通过结构校验",
+        "reviewer 回路能显式 fail 或 pass"
+      ]
+    },
+    {
+      "id": "M3",
+      "name": "题库 stage 在 L2 上可用",
+      "phase": "P3",
+      "done_when": [
+        "`coursegen generate question-bank L2` 能产出有效 JSON",
+        "coverage map 与 linked steps 校验自动运行",
+        "question bank reviewer 能阻止不合格结果进入 textbook stage"
+      ]
+    },
+    {
+      "id": "M4",
+      "name": "Textbook stage 在 L2 上可用",
+      "phase": "P4",
+      "done_when": [
+        "`coursegen generate textbook L2` 能产出 MDX 和本地 assets",
+        "QuestionRef 与 QuestionFamily 全部可解析",
+        "coverageTrace 与 sectionMap 能通过校验"
+      ]
+    },
+    {
+      "id": "M5",
+      "name": "一条命令跑通 L2 全链路",
+      "phase": "P5",
+      "done_when": [
+        "`coursegen run L2` 能按顺序执行 convert、generate、validate、review",
+        "失败 stage 可恢复，不需要重跑全部成功 stage",
+        "一次 run 有完整报告"
+      ]
+    },
+    {
+      "id": "M6",
+      "name": "系统进入持续迭代状态",
+      "phase": "P6",
+      "done_when": [
+        "新增题型不需要推翻主框架",
+        "新增 MDX 组件可通过 prompt、schema 与 validator 增量接入",
+        "L2 成为默认回归样本"
+      ]
+    }
+  ],
+  "phases": [
+    {
+      "id": "P1",
+      "name": "启动 Rust 主线",
+      "description": "建立 Rust 工作区、CLI、配置层与 convert 主路径，让系统先能围绕 L2 运行起来并记录状态。",
+      "status": "todo",
+      "objective": "先把 Rust CLI、配置、run 状态和 L2 转换 stage 跑通，建立可执行主线。",
+      "entry_criteria": [
+        "现有 Python 脚本和 prompts 可作为参考实现",
+        "`pipeline/0-raw/L2.pdf` 已存在",
+        "仓库允许新增 Rust 工程文件"
+      ],
+      "exit_criteria": [
+        "`coursegen convert L2` 能工作",
+        "run metadata、日志和 stage 状态文件具备基础结构",
+        "MinerU token、超时、轮询、输出路径都可配置"
+      ],
+      "deliverables": [
+        "Rust workspace skeleton",
+        "CLI command surface",
+        "config loader",
+        "convert stage",
+        "basic run metadata"
+      ],
+      "parallel_tracks": [
+        "CLI 与配置",
+        "MinerU 转换",
+        "artifact 路径规范"
+      ],
+      "gate_checks": [
+        "L2 convert 能完成且副作用不越出仓库",
+        "convert 失败路径可恢复",
+        "输出布局兼容后续 stage"
+      ],
+      "tasks": [
+        {
+          "id": "P1-T1",
+          "title": "建立 Rust workspace 与 CLI 骨架",
+          "description": "创建最小可编译的 Rust workspace，先把命令入口和 lesson 路径解析框架搭起来，后续 stage 都挂在这套 CLI 上。",
+          "workstream": "ws_cli",
+          "scope": [
+            "crates/app-cli",
+            "crates/pipeline-core"
+          ],
+          "depends_on": [],
+          "status": "todo",
+          "done_when": [
+            "workspace 能构建出一个 no-op CLI",
+            "run、convert、generate、review、validate 命令都已声明",
+            "L2 lesson id 能解析到仓库路径"
+          ],
+          "artifacts": [
+            "Cargo.toml",
+            "crates/app-cli",
+            "crates/pipeline-core"
+          ]
+        },
+        {
+          "id": "P1-T2",
+          "title": "实现分层配置与 dotenv 加载",
+          "description": "把环境变量、`.env` 与默认值合并成一套统一配置源，避免后面每个 stage 各自读取配置而行为漂移。",
+          "workstream": "ws_devx",
+          "scope": [
+            "crates/pipeline-core",
+            "crates/pipeline-io"
+          ],
+          "depends_on": [
+            "P1-T1"
+          ],
+          "status": "todo",
+          "done_when": [
+            "环境变量和 `.env` 都可用",
+            "token 文件路径与超时参数可配置",
+            "可打印脱敏后的 resolved config 供调试"
+          ],
+          "artifacts": [
+            "config structs",
+            "sanitized config dump",
+            "env loading module"
+          ]
+        },
+        {
+          "id": "P1-T3",
+          "title": "把 MinerU raw convert stage 迁到 Rust",
+          "description": "用 Rust 复现现有 Python 转换脚本的关键行为，包括上传、轮询、下载、解压与标准化输出，确保 L2 可进入 stage-1 plain。",
+          "workstream": "ws_convert",
+          "scope": [
+            "crates/pipeline-mineru",
+            "crates/pipeline-io"
+          ],
+          "depends_on": [
+            "P1-T2"
+          ],
+          "status": "todo",
+          "done_when": [
+            "上传、轮询、下载流程能跑通 MinerU raw API",
+            "`pipeline/1-plain/L2/` 能原子写入",
+            "job metadata 与 normalized artifacts 会落盘"
+          ],
+          "artifacts": [
+            "crates/pipeline-mineru",
+            "convert stage metadata",
+            "normalized L2 plain output"
+          ]
+        },
+        {
+          "id": "P1-T4",
+          "title": "加入 run 目录、stage 状态与 resume 标记",
+          "description": "给每次运行建立元数据目录和 stage 状态文件，为后续失败恢复、增量重跑和调试报告打基础。",
+          "workstream": "ws_cli",
+          "scope": [
+            "crates/pipeline-core",
+            "crates/pipeline-io"
+          ],
+          "depends_on": [
+            "P1-T1",
+            "P1-T3"
+          ],
+          "status": "todo",
+          "done_when": [
+            "每次 run 都有唯一 meta 目录",
+            "stage 状态可标记 pending、running、passed、failed",
+            "resume 能跳过已经成功的 convert stage"
+          ],
+          "artifacts": [
+            "run.json",
+            "stage state files",
+            "resume logic"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "P2",
+      "name": "让 Guided Story 在 L2 上跑起来",
+      "description": "在 convert 之后接上第一个真实的 LLM stage，产出 guided story 的 manifest 与 steps，并让 reviewer 回路开始工作。",
+      "status": "todo",
+      "objective": "让 Rust 系统首次完成一个真正的 LLM 生成 stage，并在 L2 上产出 guided story 成品与 reviewer 回路。",
+      "entry_criteria": [
+        "convert stage 已能在 L2 上运行",
+        "`prompts/` 下的 guided story prompt 可加载",
+        "guided story schema 已能被 Rust models 或 validators 理解"
+      ],
+      "exit_criteria": [
+        "`coursegen generate guided-story L2` 能产出 manifest 和 step files",
+        "结构校验与 reviewer 校验都可执行",
+        "headless smoke playback 路径被保留或有替代方案"
+      ],
+      "deliverables": [
+        "guided story prompt rendering",
+        "JSON generation path",
+        "guided story validators",
+        "guided story review loop"
+      ],
+      "parallel_tracks": [
+        "输入包渲染",
+        "guided story 生成",
+        "review 与 validation"
+      ],
+      "gate_checks": [
+        "step 文件是有效 JSON",
+        "manifest 与 step references 一致",
+        "term tags 与 exercise blocks 满足 schema"
+      ],
+      "tasks": [
+        {
+          "id": "P2-T1",
+          "title": "实现 prompt 加载与输入包渲染",
+          "description": "把磁盘上的 prompt 模板与 L2 lesson 输入拼成可审计的渲染结果，后续所有生成 stage 都复用这套机制。",
+          "workstream": "ws_prompt",
+          "scope": [
+            "crates/pipeline-prompts",
+            "crates/pipeline-io"
+          ],
+          "depends_on": [
+            "P1-T4"
+          ],
+          "status": "todo",
+          "done_when": [
+            "system 与 user prompt 模板可从磁盘加载",
+            "L2 的 generation input bundle 可渲染并落盘",
+            "变量缺失会快速失败并给出明确错误"
+          ],
+          "artifacts": [
+            "prompt loader",
+            "rendered prompt bundle",
+            "L2 generation input files"
+          ]
+        },
+        {
+          "id": "P2-T2",
+          "title": "实现 provider-agnostic 的 LLM 调用层",
+          "description": "抽象模型调用接口并保存请求、响应与解析结果，避免后续 stage 把某个 provider 直接写死在业务逻辑里。",
+          "workstream": "ws_prompt",
+          "scope": [
+            "crates/pipeline-llm"
+          ],
+          "depends_on": [
+            "P2-T1"
+          ],
+          "status": "todo",
+          "done_when": [
+            "request 与 response payload 都可按 stage 落盘",
+            "timeout、retry、backoff 可配置",
+            "raw outputs 与 parsed outputs 都保留"
+          ],
+          "artifacts": [
+            "LLM client abstraction",
+            "raw response store",
+            "retry policy"
+          ]
+        },
+        {
+          "id": "P2-T3",
+          "title": "在 L2 上生成 guided story manifest 与 steps",
+          "description": "真正把 L2 lesson 输入送进模型，生成 `pipeline/3-guided_story/` 所需的 manifest 和 step JSON 文件。",
+          "workstream": "ws_story",
+          "scope": [
+            "crates/pipeline-story",
+            "crates/pipeline-models"
+          ],
+          "depends_on": [
+            "P2-T2"
+          ],
+          "status": "todo",
+          "done_when": [
+            "`pipeline/3-guided_story/` 下写出 manifest 与 step JSON",
+            "sequence ids 与 file paths 可预测",
+            "term catalog 与 exercise 字段进入 typed models"
+          ],
+          "artifacts": [
+            "guided story generator",
+            "L2 manifest",
+            "L2 step JSON files"
+          ]
+        },
+        {
+          "id": "P2-T4",
+          "title": "加入 guided story 校验与 reviewer gate",
+          "description": "在 guided story 输出后立即执行结构校验和 reviewer 审查，防止坏产物流入题库阶段。",
+          "workstream": "ws_review",
+          "scope": [
+            "crates/pipeline-review",
+            "crates/pipeline-models"
+          ],
+          "depends_on": [
+            "P2-T3"
+          ],
+          "status": "todo",
+          "done_when": [
+            "schema 与 reference 校验会先于 reviewer 运行",
+            "reviewer 可显式 pass 或 fail",
+            "失败会把可执行反馈写回 run metadata"
+          ],
+          "artifacts": [
+            "guided story validator",
+            "guided story review report",
+            "repair-ready failure report"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "P3",
+      "name": "让题库在 L2 上跑起来",
+      "description": "基于 guided story 与 plain text 生成结构化题库，并把 coverage、linked steps 与 family 引用纳入程序门禁。",
+      "status": "todo",
+      "objective": "在 guided story 基础上生成题库，并把 coverage、linked steps、family 引用等高风险结构正式纳入程序校验。",
+      "entry_criteria": [
+        "guided story stage 已能在 L2 上运行",
+        "question bank prompt contracts 可用",
+        "coverage 相关输入包可渲染"
+      ],
+      "exit_criteria": [
+        "`coursegen generate question-bank L2` 能产出有效 JSON",
+        "coverage_map、linked_steps、question ids 都会自动校验",
+        "question bank reviewer 能阻止不合格产物进入 textbook stage"
+      ],
+      "deliverables": [
+        "question bank generator",
+        "coverage validators",
+        "question reviewer loop"
+      ],
+      "parallel_tracks": [
+        "question input bundle",
+        "question generation",
+        "coverage 与 reviewer validation"
+      ],
+      "gate_checks": [
+        "family ids 与 question ids 唯一",
+        "linked_steps 都存在于 manifest",
+        "coverage_map 不引用缺失 family"
+      ],
+      "tasks": [
+        {
+          "id": "P3-T1",
+          "title": "从 L2 源材料组装 question-bank 输入包",
+          "description": "把 coverage checklist、source outline、lesson map 与上游产物组合成题库生成所需的统一上下文。",
+          "workstream": "ws_prompt",
+          "scope": [
+            "crates/pipeline-prompts",
+            "crates/pipeline-story"
+          ],
+          "depends_on": [
+            "P2-T4"
+          ],
+          "status": "todo",
+          "done_when": [
+            "coverage_checklist、source_outline、lesson_map 可推导或注入",
+            "guided story 与 plain text 可组成统一 render context",
+            "输入包会落盘用于审计"
+          ],
+          "artifacts": [
+            "question-bank input bundle",
+            "coverage source pack",
+            "audit markdown"
+          ]
+        },
+        {
+          "id": "P3-T2",
+          "title": "实现题库生成 stage",
+          "description": "生成 flashcard 和 longform 两层题库结构，并把结果落成稳定 JSON 供后续 textbook 与校验逻辑使用。",
+          "workstream": "ws_qbank",
+          "scope": [
+            "crates/pipeline-qbank",
+            "crates/pipeline-models",
+            "crates/pipeline-llm"
+          ],
+          "depends_on": [
+            "P3-T1"
+          ],
+          "status": "todo",
+          "done_when": [
+            "题库 JSON 能生成并解析为 typed models",
+            "flashcard 与 longform families 都被支持",
+            "新增题型不需要改 top-level stage protocol"
+          ],
+          "artifacts": [
+            "question bank generator",
+            "L2 question bank JSON",
+            "typed question-bank models"
+          ]
+        },
+        {
+          "id": "P3-T3",
+          "title": "为题库加入 reference 与 coverage validators",
+          "description": "把 family id、question id、coverage_map、linked_steps 这些结构约束变成程序级检查，而不是只依赖 reviewer 自然语言判断。",
+          "workstream": "ws_review",
+          "scope": [
+            "crates/pipeline-review",
+            "crates/pipeline-models"
+          ],
+          "depends_on": [
+            "P3-T2"
+          ],
+          "status": "todo",
+          "done_when": [
+            "coverage_map 只引用存在的 family",
+            "所有 linked_steps 都存在于 guided story manifest",
+            "重复 family id 或 question id 会让 stage fail"
+          ],
+          "artifacts": [
+            "question bank validator",
+            "coverage validation report",
+            "reference validation report"
+          ]
+        },
+        {
+          "id": "P3-T4",
+          "title": "跑通题库 reviewer 与 repair loop",
+          "description": "当 reviewer 发现 coverage 缺口、引用错误或题型设计问题时，系统能带修复提示重跑，而不是人工手搓补丁。",
+          "workstream": "ws_review",
+          "scope": [
+            "crates/pipeline-review",
+            "crates/pipeline-qbank"
+          ],
+          "depends_on": [
+            "P3-T3"
+          ],
+          "status": "todo",
+          "done_when": [
+            "reviewer prompt 能针对 candidate question bank 运行",
+            "reviewer fail 后可带 fix hints 重跑",
+            "进入 textbook stage 前必须显式 pass"
+          ],
+          "artifacts": [
+            "question reviewer report",
+            "repair hints bundle",
+            "review gate result"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "P4",
+      "name": "让课本在 L2 上跑起来",
+      "description": "在题库基础上生成 lesson 级 MDX 课本，并把图片资产、引用和 coverageTrace 都收进程序控制。",
+      "status": "todo",
+      "objective": "在题库稳定后生成 lesson 级 textbook，并把 MDX 引用、资产复制和 coverageTrace 纳入程序控制。",
+      "entry_criteria": [
+        "question bank stage 已能在 L2 上通过",
+        "textbook prompts 可用",
+        "`pipeline/1-plain/L2/` 的图片资产可枚举"
+      ],
+      "exit_criteria": [
+        "`coursegen generate textbook L2` 能产出 MDX 与 assets",
+        "QuestionRef 与 QuestionFamily 全部可验证",
+        "coverageTrace 与 sectionMap 校验可执行"
+      ],
+      "deliverables": [
+        "textbook generator",
+        "asset selection and copy module",
+        "MDX validator",
+        "textbook reviewer gate"
+      ],
+      "parallel_tracks": [
+        "textbook prompt rendering",
+        "MDX generation",
+        "image asset handling",
+        "cross-reference validation"
+      ],
+      "gate_checks": [
+        "所有 question references 都能解析",
+        "所有 asset paths 都存在于本地",
+        "textbook 输出中不含 `StepLink`"
+      ],
+      "tasks": [
+        {
+          "id": "P4-T1",
+          "title": "实现 textbook generation 输入包",
+          "description": "把题库、guided story、plain text 与 related materials 组织成 textbook 生成所需的 lesson 级上下文。",
+          "workstream": "ws_prompt",
+          "scope": [
+            "crates/pipeline-prompts",
+            "crates/pipeline-qbank"
+          ],
+          "depends_on": [
+            "P3-T4"
+          ],
+          "status": "todo",
+          "done_when": [
+            "question bank、guided story 与 plain text 可组合成统一 render context",
+            "coverageTrace 源项在 prompt 中显式可用",
+            "输入包会落盘供调试"
+          ],
+          "artifacts": [
+            "textbook input bundle",
+            "coverage trace source pack",
+            "rendered textbook prompts"
+          ]
+        },
+        {
+          "id": "P4-T2",
+          "title": "实现确定性的图片选择与复制流程",
+          "description": "由程序负责枚举候选图片、选择被引用的资产并复制到课本目录，禁止模型直接发明本地文件路径。",
+          "workstream": "ws_textbook",
+          "scope": [
+            "crates/pipeline-textbook",
+            "crates/pipeline-io"
+          ],
+          "depends_on": [
+            "P4-T1"
+          ],
+          "status": "todo",
+          "done_when": [
+            "可从 stage-1 artifacts 枚举候选图片",
+            "选中的图片由程序复制到 textbook-local 目录",
+            "模型不会直接发明文件系统路径"
+          ],
+          "artifacts": [
+            "asset selection module",
+            "asset copy module",
+            "L2 textbook asset directory"
+          ]
+        },
+        {
+          "id": "P4-T3",
+          "title": "在 L2 上生成 textbook MDX",
+          "description": "生成可保存的 lesson 级 MDX 成品，包含 sectionMap、coverageTrace、组件引用和本地 assets 路径。",
+          "workstream": "ws_textbook",
+          "scope": [
+            "crates/pipeline-textbook",
+            "crates/pipeline-llm",
+            "crates/pipeline-models"
+          ],
+          "depends_on": [
+            "P4-T2"
+          ],
+          "status": "todo",
+          "done_when": [
+            "MDX 输出写入 `pipeline/5-textbook/`",
+            "sectionMap 与 coverageTrace 被保留并可解析",
+            "新增 MDX 组件不需要改 stage 入口"
+          ],
+          "artifacts": [
+            "textbook generator",
+            "L2 textbook MDX",
+            "textbook assets"
+          ]
+        },
+        {
+          "id": "P4-T4",
+          "title": "加入 textbook validation 与 reviewer gate",
+          "description": "在课本输出后检查 QuestionRef、QuestionFamily、sectionMap、coverageTrace 和禁止项，确保成品可进入端到端主链。",
+          "workstream": "ws_review",
+          "scope": [
+            "crates/pipeline-review",
+            "crates/pipeline-textbook"
+          ],
+          "depends_on": [
+            "P4-T3"
+          ],
+          "status": "todo",
+          "done_when": [
+            "QuestionRef 与 QuestionFamily 会对题库解析",
+            "section ids、sectionMap、coverageTrace 会交叉校验",
+            "textbook reviewer 可 fail stage 并触发 repair"
+          ],
+          "artifacts": [
+            "textbook validator",
+            "textbook review report",
+            "repair-ready reviewer output"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "P5",
+      "name": "把 L2 全链路串起来",
+      "description": "把 convert、guided story、question bank、textbook、validation 与 reviewer 回路编排成一个可恢复的 run 命令。",
+      "status": "todo",
+      "objective": "把 convert、guided story、question bank、textbook、validation、review 串成一个真正可恢复的 `run L2` 命令。",
+      "entry_criteria": [
+        "convert、guided story、question bank、textbook stage 都已存在",
+        "每个 stage 都落够 metadata 以支持 resume",
+        "validator 与 reviewer 都能输出 machine-readable pass 或 fail"
+      ],
+      "exit_criteria": [
+        "`coursegen run L2` 能串起整条链路",
+        "失败时可从最后失败 stage 继续",
+        "一次 run 有总报告、stage 报告与原始产物索引"
+      ],
+      "deliverables": [
+        "end-to-end orchestrator",
+        "resume semantics",
+        "run report",
+        "rate-limit aware execution policy"
+      ],
+      "parallel_tracks": [
+        "stage orchestration",
+        "resume 与 retry policy",
+        "reporting"
+      ],
+      "gate_checks": [
+        "成功的早期 stage 不会被无谓重跑",
+        "每个 stage 的 raw prompts 与 raw outputs 都被保留",
+        "TPS 波动不会导致静默损坏"
+      ],
+      "tasks": [
+        {
+          "id": "P5-T1",
+          "title": "实现 stage graph 与 run orchestration",
+          "description": "把各 stage 的先后关系和输入输出依赖编码成统一的执行图，避免后续每个命令各写一套流程。",
+          "workstream": "ws_cli",
+          "scope": [
+            "crates/pipeline-core",
+            "crates/app-cli"
+          ],
+          "depends_on": [
+            "P4-T4"
+          ],
+          "status": "todo",
+          "done_when": [
+            "run 命令能按依赖顺序执行 stages",
+            "单独命令与 end-to-end 命令共用同一 stage engine",
+            "未来新增能力不需要推翻 stage graph"
+          ],
+          "artifacts": [
+            "run orchestrator",
+            "stage graph",
+            "CLI run command"
+          ]
+        },
+        {
+          "id": "P5-T2",
+          "title": "加入 resume、retry 与 backoff 策略",
+          "description": "为模型调用和 API 调用增加恢复能力，使 TPS 波动或临时失败不会导致整条链路从头再来。",
+          "workstream": "ws_cli",
+          "scope": [
+            "crates/pipeline-core",
+            "crates/pipeline-llm"
+          ],
+          "depends_on": [
+            "P5-T1"
+          ],
+          "status": "todo",
+          "done_when": [
+            "失败 stage 可独立重试",
+            "API 与 LLM 调用都有可配置 retry 与 backoff",
+            "resume 可从 L2 上次失败 stage 继续"
+          ],
+          "artifacts": [
+            "resume policy",
+            "retry policy",
+            "stage replay support"
+          ]
+        },
+        {
+          "id": "P5-T3",
+          "title": "产出端到端 run reports",
+          "description": "为一次完整运行输出可读的汇总报告和可追踪的调试索引，方便定位失败 stage 与 prompt/output 痕迹。",
+          "workstream": "ws_devx",
+          "scope": [
+            "crates/pipeline-core",
+            "crates/pipeline-review"
+          ],
+          "depends_on": [
+            "P5-T2"
+          ],
+          "status": "todo",
+          "done_when": [
+            "run summary 包含 stage status、outputs 与 review results",
+            "报告会指向 prompt bundles 与 raw outputs",
+            "报告可作为 L2 regression 调试入口"
+          ],
+          "artifacts": [
+            "run report",
+            "stage summaries",
+            "debug index"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "P6",
+      "name": "进入持续迭代模式",
+      "description": "在主链稳定后继续扩展题型、MDX 组件、reviewer 与回归体系，让系统支持真实需求驱动的长期演化。",
+      "status": "todo",
+      "objective": "在主链可用后，针对真实需求持续迭代题型、MDX 组件、资产策略和 reviewer，而不是预先冻结产品边界。",
+      "entry_criteria": [
+        "`coursegen run L2` 至少成功跑完一次",
+        "schema 与 validator 层已经保护住基础结构",
+        "新能力可通过一轮 L2 regression 验证"
+      ],
+      "exit_criteria": [
+        "新增题型和 MDX 组件不需要推翻主架构",
+        "新能力可通过 prompt、schema 与 validator 的小步改动接入",
+        "L2 保持为持续回归样本"
+      ],
+      "deliverables": [
+        "feature iteration loop",
+        "extensible component and question-type protocol",
+        "regression fixtures"
+      ],
+      "parallel_tracks": [
+        "question type evolution",
+        "MDX component evolution",
+        "reviewer evolution",
+        "fixture 与 regression maintenance"
+      ],
+      "gate_checks": [
+        "新 feature 不破坏现有 references 与 validators",
+        "feature 能在 L2 上测试，不需要大量 special-case branching",
+        "prompt changes 仍然与具体课程内容解耦"
+      ],
+      "tasks": [
+        {
+          "id": "P6-T1",
+          "title": "设计可插拔的题型注册机制",
+          "description": "把题型扩展变成局部增量开发问题，而不是每新增一种题型都要改动整个 question bank stage。",
+          "workstream": "ws_qbank",
+          "scope": [
+            "crates/pipeline-qbank",
+            "crates/pipeline-models"
+          ],
+          "depends_on": [
+            "P5-T3"
+          ],
+          "status": "todo",
+          "done_when": [
+            "新增 flashcard 或 longform type 只需扩展 typed models 与 validators",
+            "已有 stage entrypoints 保持不变",
+            "L2 至少能接入一种新增题型而不靠 hack"
+          ],
+          "artifacts": [
+            "question-type registry",
+            "extended question models",
+            "updated validators"
+          ]
+        },
+        {
+          "id": "P6-T2",
+          "title": "设计可扩展的 MDX 组件协议",
+          "description": "让不同学科、不同交互方式的课本组件可以逐步接入，并被统一的 validator 和 renderer 理解。",
+          "workstream": "ws_textbook",
+          "scope": [
+            "crates/pipeline-textbook",
+            "crates/pipeline-models"
+          ],
+          "depends_on": [
+            "P5-T3"
+          ],
+          "status": "todo",
+          "done_when": [
+            "新增 component kinds 不需要重写 textbook stage",
+            "组件使用方式可被 lint 或结构校验",
+            "L2 能在主链跑通后接入至少一类新组件"
+          ],
+          "artifacts": [
+            "MDX component protocol",
+            "component validator rules",
+            "sample extended textbook output"
+          ]
+        },
+        {
+          "id": "P6-T3",
+          "title": "把 L2 升级为 regression fixture 并加入 golden checks",
+          "description": "把 L2 固化为持续回归样本，用结构检查和 golden 结果保护主链不被后续迭代悄悄破坏。",
+          "workstream": "ws_devx",
+          "scope": [
+            "crates/pipeline-review",
+            "crates/pipeline-io"
+          ],
+          "depends_on": [
+            "P5-T3"
+          ],
+          "status": "todo",
+          "done_when": [
+            "L2 可在 regression mode 下运行结构检查",
+            "schema drift 与 reference drift 能被自动抓住",
+            "后续 feature work 都可用 L2 作为稳定比较样本"
+          ],
+          "artifacts": [
+            "L2 regression fixture",
+            "golden structure checks",
+            "regression runner"
+          ]
+        }
+      ]
+    }
+  ]
+}
