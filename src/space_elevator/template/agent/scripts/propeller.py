@@ -833,6 +833,22 @@ def summarize_progress(progress_items: Iterable[dict[str, object]]) -> str:
     return "; ".join(incomplete[:3])
 
 
+def should_launch_codex(
+    previous_snapshot_hash: object,
+    changed: bool,
+    codex_running: bool,
+    codex_exited: bool,
+    cooldown_ready: bool,
+) -> bool:
+    if codex_exited:
+        return True
+    if codex_running or not cooldown_ready:
+        return False
+    if previous_snapshot_hash is None:
+        return True
+    return not changed
+
+
 def main() -> int:
     args = parse_args()
     args.repo = args.repo.resolve()
@@ -925,7 +941,13 @@ def main() -> int:
             last_launch_ts = float(state.get("last_launch_ts", 0.0) or 0.0)
             cooldown_ready = now - last_launch_ts >= args.codex_cooldown_seconds
 
-            should_launch = codex_exited or (not changed and not codex_running and cooldown_ready)
+            should_launch = should_launch_codex(
+                previous_snapshot_hash=previous_snapshot_hash,
+                changed=changed,
+                codex_running=codex_running,
+                codex_exited=codex_exited,
+                cooldown_ready=cooldown_ready,
+            )
             if should_launch:
                 try:
                     launch = launch_codex(args, args.state_dir, log)
