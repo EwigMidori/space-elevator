@@ -17,7 +17,8 @@ This directory is a small project-management harness intended to be copied into 
 
 - `.ci/agent` lives directly under the repository root.
 - The live roadmap lives at `<repo-root>/docs/progress.json`.
-- Active batch specs live under `<main_worktree_root>/.tmp/`, not inside ephemeral worktrees.
+- Active batch specs live under `<main_worktree_root>/.tmp/`.
+- Dedicated batch implementation worktrees should also live under `<main_worktree_root>/.tmp/worktrees/` so the whole batch sandbox stays under one local-only root.
 - `.tmp/` should be locally ignored. `propeller.py` will try to add `/.tmp/` to `.git/info/exclude` automatically.
 
 ## Useful Commands
@@ -33,4 +34,4 @@ python3 .ci/agent/scripts/propeller.py
 1. Copy or adapt the starter roadmap into `docs/progress.json`.
 2. Replace the template phases in `docs/progress.json` with repository-specific work.
 3. Review `.ci/agent/AGENTS.md` and remove any rules that do not fit this repository's actual workflow.
-4. Confirm `<main_worktree_root>/.tmp/` is locally ignored and available for specs.
+4. Confirm `<main_worktree_root>/.tmp/` is locally ignored and available for specs and batch worktrees.

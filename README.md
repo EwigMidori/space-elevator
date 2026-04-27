@@ -78,6 +78,7 @@ The installed template expects:
 - the copied directory to live at `<repo-root>/.ci/agent/`
 - the live mutable roadmap to live at `<repo-root>/docs/progress.json`
 - active batch specs to live at `<main_worktree_root>/.tmp/`
+- batch implementation worktrees to live at `<main_worktree_root>/.tmp/worktrees/`
 - local git ignore rules to permit `/.tmp/` scratch state
 
 Useful commands after vendoring:

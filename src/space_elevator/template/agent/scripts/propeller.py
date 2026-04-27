@@ -622,7 +622,7 @@ def default_prompt(repo: Path) -> str:
 2. 严格遵守 `.ci/agent/AGENTS.md` 中的 PDCA 多代理流程、分支/工作树约束、进度状态约束和评审门槛。
 3. 只推进 `docs/progress.json` 允许启动的下一个未完成阶段/任务；不要越过 phase gate。
 4. 作为 Architect Agent，不要手改业务代码、测试代码、fixtures 或其他源码；需要实现时应先写/更新主仓库根目录 `.tmp/` 下的规格，再委派 Worker/Test/Review Agent，并在评审通过后集成。
-5. 所有实现工作必须使用 dedicated non-default-branch worktree 和 batch branch；不要直接在默认分支所在 worktree 上做实现。
+5. 所有实现工作必须使用 dedicated non-default-branch worktree 和 batch branch；不要直接在默认分支所在 worktree 上做实现。该 batch worktree 必须创建在 `<main_worktree_root>/.tmp/worktrees/` 下，例如 `git worktree add <main_worktree_root>/.tmp/worktrees/<batch-id> <branch>`。
 6. 只有在真实评审达到要求后，才允许把 `docs/progress.json` 里的 progress 项目标记为 done。
 7. 禁止把任何已经是 done 的 phase 或 task 改回 todo、in_progress、blocked 或 ready_for_review。可以默认信任现有 done 状态是经过审核后成立的，除非你发现 `docs/progress.json` 本身损坏到无法解释，此时只能记录异常，不能自行回退这些 done 项。
 8. 在启动任何 worker 之前，你必须先写出一份足够细的 `.tmp/` 实施规格，细到一个合格初级工程师无需猜测也能完成；如果规格缺少目标/非目标、作用范围与文件归属、冻结接口、任务切片、关键流程、错误路径、边界条件、验收标准、依赖前置条件、禁止擅自扩 scope 等信息，不得派工。
