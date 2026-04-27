@@ -1,13 +1,13 @@
 # AGENTS
 
-This file defines the repository-wide authority model, workflow, and boundary rules for the local `_pm` harness.
+This file defines the repository-wide authority model, workflow, and boundary rules for the local `.ci/agent` harness.
 
 Its purpose is simple: prevent AI agents and developers from placing work in the wrong layer, reversing dependencies, leaking implementation details across boundaries, or bypassing review and progress discipline.
 
 ## Roadmap Source Of Truth
 
 - The execution roadmap lives in `docs/progress.json`.
-- `_pm/progress.json` is only the vendorable starter template kept with the harness.
+- `.ci/agent/progress.json` is only the vendorable starter template kept with the harness.
 - Before starting any substantial implementation, refactor, or cross-boundary change, read `docs/progress.json`.
 - AI agents must align proposed work with the current phase, task dependencies, and gate conditions in `docs/progress.json`.
 - Do not invent a parallel roadmap in comments, commit messages, or ad hoc notes when `docs/progress.json` already covers the plan.
@@ -18,20 +18,20 @@ Its purpose is simple: prevent AI agents and developers from placing work in the
 - The detailed implementation spec for the current batch must live under `<main_worktree_root>/.tmp/`.
 - Specs live in the main worktree root on purpose so they survive temporary worktree deletion and remain auditable after integration.
 - Before starting a batch of delegated work, the Architect Agent must write an implementation spec detailed enough that a capable junior engineer could execute it without guessing.
-- That spec must pass the review gate in `_pm/docs/agents/spec-review.md` before worker agents start.
+- That spec must pass the review gate in `.ci/agent/docs/agents/spec-review.md` before worker agents start.
 - If the Architect Agent inserts refactor work because the current architecture would degrade downstream implementation quality, that refactor batch or phase must also have its own `.tmp/` spec and must pass spec review before worker agents start.
 - Worker Agents and Review Agents must treat the current `.tmp/` implementation spec as binding execution guidance for the active batch.
 
 ## Agent Rule Documents
 
-- Agent-specific rule documents live under `_pm/docs/agents/`.
-- `_pm/docs/agents/README.md` is the index.
-- `_pm/docs/agents/spec-review.md` defines the binding spec review gate.
-- `_pm/docs/agents/architect-agent.md` defines Architect Agent rules.
-- `_pm/docs/agents/worker-agent.md` defines Worker Agent rules.
-- `_pm/docs/agents/test-agent.md` defines Test Agent rules.
-- `_pm/docs/agents/review-agent.md` defines Review Agent rules.
-- `_pm/AGENTS.md` remains the source of truth for repository-wide authority, workflow, branch policy, progress policy, and boundary rules.
+- Agent-specific rule documents live under `.ci/agent/docs/agents/`.
+- `.ci/agent/docs/agents/README.md` is the index.
+- `.ci/agent/docs/agents/spec-review.md` defines the binding spec review gate.
+- `.ci/agent/docs/agents/architect-agent.md` defines Architect Agent rules.
+- `.ci/agent/docs/agents/worker-agent.md` defines Worker Agent rules.
+- `.ci/agent/docs/agents/test-agent.md` defines Test Agent rules.
+- `.ci/agent/docs/agents/review-agent.md` defines Review Agent rules.
+- `.ci/agent/AGENTS.md` remains the source of truth for repository-wide authority, workflow, branch policy, progress policy, and boundary rules.
 
 ## PDCA Multi-Agent Workflow
 
@@ -51,7 +51,7 @@ This repository uses a feedback-driven PDCA workflow for substantial implementat
 ### Required Workflow
 
 1. The Architect Agent writes a detailed implementation spec in `<main_worktree_root>/.tmp/`.
-2. Before assigning any implementation work, the Architect Agent must start a Review Agent to perform spec review under `_pm/docs/agents/spec-review.md`.
+2. Before assigning any implementation work, the Architect Agent must start a Review Agent to perform spec review under `.ci/agent/docs/agents/spec-review.md`.
 3. The Architect Agent must revise the spec in response to that review before assigning any work.
 4. The Architect Agent must not assign implementation work while the spec review still has blocking findings.
 5. Only after the spec review has no blocking findings may the Architect Agent start worker agents, and it must explicitly tell each one its agent type and owned scope.
@@ -94,7 +94,7 @@ This repository uses a feedback-driven PDCA workflow for substantial implementat
 ## Progress Status Authority
 
 - `docs/progress.json` is review-gated.
-- Review scoring and acceptance thresholds are defined in `_pm/docs/review-scoring.md`.
+- Review scoring and acceptance thresholds are defined in `.ci/agent/docs/review-scoring.md`.
 - Worker Agents must never mark any task or phase as `done`.
 - The Architect Agent must never unilaterally mark any task or phase as `done` based on implementation alone.
 - The Architect Agent may restructure future roadmap items in `docs/progress.json` when the existing task list no longer matches the required next work, but that authority does not include marking any task or phase as `done`.
@@ -157,7 +157,7 @@ smoke tests
 ## Documentation Rules
 
 - Document why a design exists, not only what the code already says.
-- Durable PM rules live in `_pm/`.
+- Durable PM rules live in `.ci/agent/`.
 - Active specs, temporary planning material, local research, and scratch copies live under `<main_worktree_root>/.tmp/`.
 - `.tmp/` should be locally ignored from git tracking.
 - When code changes alter roadmap assumptions or delivery sequencing, update `docs/progress.json` together with the implementation.
@@ -220,7 +220,7 @@ Forbidden examples in a layered repository:
 
 When deciding where a change belongs:
 
-1. Is it planning, coordination, or review workflow? Keep it in `_pm/` or `.tmp/`.
+1. Is it planning, coordination, or review workflow? Keep it in `.ci/agent/` or `.tmp/`.
 2. Is it a stable product behavior? Put it in the narrowest existing production module that already owns that behavior.
 3. Is it delivery-specific wiring? Keep it in the delivery or composition layer.
 4. Is it infrastructure or adapter logic? Keep it behind the repository's implementation boundary.

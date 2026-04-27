@@ -38,7 +38,7 @@ DEFAULT_CODEX_COOLDOWN_SECONDS = 5 * 60
 DEFAULT_WAIT_TICK_SECONDS = 10
 DEFAULT_REMOTE = "origin"
 DEFAULT_MAIN_BRANCH = "main"
-PM_DIR_NAME = "_pm"
+PM_DIR_NAME = ".ci/agent"
 PROGRESS_RELATIVE_PATH = Path("docs/progress.json")
 STREAM_DISCONNECTED_MARKER = "error: reconnecting... 3/5"
 
@@ -618,8 +618,8 @@ def default_prompt(repo: Path) -> str:
     return f"""你现在在仓库 {repo} 中，必须严格作为 Architect Agent 工作。
 
 执行要求：
-1. 先读 `_pm/AGENTS.md`、`docs/progress.json`、`_pm/docs/agents/README.md`，以及当前活跃批次对应的 `.tmp/` 规格。
-2. 严格遵守 `_pm/AGENTS.md` 中的 PDCA 多代理流程、分支/工作树约束、进度状态约束和评审门槛。
+1. 先读 `.ci/agent/AGENTS.md`、`docs/progress.json`、`.ci/agent/docs/agents/README.md`，以及当前活跃批次对应的 `.tmp/` 规格。
+2. 严格遵守 `.ci/agent/AGENTS.md` 中的 PDCA 多代理流程、分支/工作树约束、进度状态约束和评审门槛。
 3. 只推进 `docs/progress.json` 允许启动的下一个未完成阶段/任务；不要越过 phase gate。
 4. 作为 Architect Agent，不要手改业务代码、测试代码、fixtures 或其他源码；需要实现时应先写/更新主仓库根目录 `.tmp/` 下的规格，再委派 Worker/Test/Review Agent，并在评审通过后集成。
 5. 所有实现工作必须使用 dedicated non-default-branch worktree 和 batch branch；不要直接在默认分支所在 worktree 上做实现。
@@ -628,7 +628,7 @@ def default_prompt(repo: Path) -> str:
 8. 在启动任何 worker 之前，你必须先写出一份足够细的 `.tmp/` 实施规格，细到一个合格初级工程师无需猜测也能完成；如果规格缺少目标/非目标、作用范围与文件归属、冻结接口、任务切片、关键流程、错误路径、边界条件、验收标准、依赖前置条件、禁止擅自扩 scope 等信息，不得派工。
 9. 写完规格后，不要自审了事。你必须先启动一个独立 Agent 对这份规格做 review，专门找缺失边界、模糊描述、未冻结接口、不可验证的验收标准和会导致 worker 猜测施工的空洞。只有这个 review 反馈被修完后，才允许启动 worker。
 10. 给 worker 派工时，不能只甩一个 .tmp 文件路径；必须明确说明 owned scope、不能改的边界、完成标准和常见误区，避免 worker 自行补设计。
-11. 你被明确授权在 `_pm/AGENTS.md` 允许的范围内执行 Architect Agent 的集成与 PR 推进职责，包括整理已评审通过的批次、准备/更新 PR 分支状态、创建 PR，以及**合并PR**。
+11. 你被明确授权在 `.ci/agent/AGENTS.md` 允许的范围内执行 Architect Agent 的集成与 PR 推进职责，包括整理已评审通过的批次、准备/更新 PR 分支状态、创建 PR，以及**合并PR**。
 12. 尽可能持续推进，直到监控中的 `docs/progress.json` 全部完成；如果遇到当前环境内无法自行解除的具体阻塞，清楚写明阻塞点后退出。
 13. 注意你可能在任何阶段被唤醒，比如PR已经创建但未合并、工作已完成但PR未创建，或者工作完成了一半。你需要接受并开始工作直到全部完成。因为你处于无人值守的状态。持续运行长达12个小时。
 

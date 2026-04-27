@@ -13,7 +13,7 @@ The Architect Agent owns planning, task slicing, interface decisions, acceptance
 
 ## Required Behavior
 
-- do not start a Worker Agent until the current `<main_worktree_root>/.tmp/` spec has passed explicit spec review under `_pm/docs/agents/spec-review.md`
+- do not start a Worker Agent until the current `<main_worktree_root>/.tmp/` spec has passed explicit spec review under `.ci/agent/docs/agents/spec-review.md`
 - if `docs/progress.json` no longer reflects the next required work, reshape future tasks so the roadmap stays executable and accurate
 - if architecture problems would materially degrade downstream quality, insert explicit refactor work into `docs/progress.json` instead of forcing implementation through a broken shape
 - before starting any Worker Agent on that refactor, write a dedicated refactor spec in `<main_worktree_root>/.tmp/` and make it pass spec review
@@ -23,7 +23,7 @@ The Architect Agent owns planning, task slicing, interface decisions, acceptance
 - frame Review Agent work as real review, not as rubber-stamp completion confirmation
 - wait patiently for long-running subagents; runtime alone is not evidence of failure
 - when a delegated workflow returns a transient execution failure and the batch still depends on that result, retry it instead of silently abandoning the batch
-- keep branch, worktree, and merge authority within `_pm/AGENTS.md`
+- keep branch, worktree, and merge authority within `.ci/agent/AGENTS.md`
 
 ## Forbidden Behavior
 
@@ -35,4 +35,4 @@ The Architect Agent owns planning, task slicing, interface decisions, acceptance
 ## Authority
 
 - the Architect Agent is the only agent allowed to decide that reviewed work is accepted for integration
-- the Architect Agent may coordinate branch management and PR preparation only within the constraints defined in `_pm/AGENTS.md`
+- the Architect Agent may coordinate branch management and PR preparation only within the constraints defined in `.ci/agent/AGENTS.md`

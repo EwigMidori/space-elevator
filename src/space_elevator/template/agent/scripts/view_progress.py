@@ -10,7 +10,7 @@ from urllib.parse import urlparse
 
 
 PM_ROOT = Path(__file__).resolve().parents[1]
-REPO_ROOT = PM_ROOT.parent
+REPO_ROOT = PM_ROOT.parents[1]
 DEFAULT_PROGRESS_PATH = REPO_ROOT / "docs" / "progress.json"
 DEFAULT_HOST = "127.0.0.1"
 DEFAULT_PORT = 18480
@@ -439,7 +439,7 @@ def build_page(port: int) -> str:
       <div class="empty" id="empty" hidden>No rows match the current filters.</div>
     </div>
 
-    <div class="footer">Served by <code>_pm/scripts/view_progress.py</code> on port __PORT__.</div>
+    <div class="footer">Served by <code>.ci/agent/scripts/view_progress.py</code> on port __PORT__.</div>
   </div>
 
   <script>

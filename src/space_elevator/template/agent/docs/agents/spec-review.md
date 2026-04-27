@@ -44,7 +44,7 @@ The spec review must look for:
 - vague or non-verifiable acceptance criteria
 - weak task slicing that would cause overlapping ownership
 - omissions that would force a Worker Agent to guess design intent
-- contradictions with `_pm/AGENTS.md` or `docs/progress.json`
+- contradictions with `.ci/agent/AGENTS.md` or `docs/progress.json`
 
 ## Review Outcome
 

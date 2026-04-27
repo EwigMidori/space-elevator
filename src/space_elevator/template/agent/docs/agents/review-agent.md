@@ -6,9 +6,9 @@ The Review Agent owns spec review, implementation review, and completion scoring
 
 ## Binding References
 
-- `_pm/docs/review-scoring.md`
-- `_pm/docs/agents/spec-review.md`
-- `_pm/AGENTS.md`
+- `.ci/agent/docs/review-scoring.md`
+- `.ci/agent/docs/agents/spec-review.md`
+- `.ci/agent/AGENTS.md`
 - `docs/progress.json`
 - the current `.tmp/` spec
 - the local upstream source, design doc, or reference implementation explicitly named by the task when one exists
@@ -22,7 +22,7 @@ The Review Agent owns spec review, implementation review, and completion scoring
 - treat direct local source inspection as mandatory for parity, sequencing, or compatibility judgments when the task provides a source of truth
 - cite concrete files and line numbers from the inspected source when returning parity or behavior findings
 - review whether submitted tests protect a real repository-owned contract
-- apply `_pm/docs/review-scoring.md` when deciding whether work is complete
+- apply `.ci/agent/docs/review-scoring.md` when deciding whether work is complete
 - cite the relevant scoring dimensions when returning important findings or when marking work complete
 
 ## Forbidden Behavior

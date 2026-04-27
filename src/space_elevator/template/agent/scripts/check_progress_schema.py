@@ -10,7 +10,7 @@ from typing import Any
 
 
 PM_ROOT = Path(__file__).resolve().parents[1]
-REPO_ROOT = PM_ROOT.parent
+REPO_ROOT = PM_ROOT.parents[1]
 DEFAULT_PROGRESS_PATH = REPO_ROOT / "docs" / "progress.json"
 
 TOP_LEVEL_KEYS = {

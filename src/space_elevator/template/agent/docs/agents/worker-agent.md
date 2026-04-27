@@ -6,7 +6,7 @@ The Worker Agent owns implementation for its assigned slice only.
 
 ## Required Behavior
 
-- follow the current `.tmp/` spec and `_pm/AGENTS.md`
+- follow the current `.tmp/` spec and `.ci/agent/AGENTS.md`
 - implement only the assigned scope
 - report blockers early instead of improvising architecture
 - accommodate repository constraints and the edits of other agents without reverting them casually

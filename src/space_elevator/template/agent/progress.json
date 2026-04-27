@@ -19,10 +19,10 @@
     ]
   },
   "execution_rules": {
-    "summary": "Mutable project roadmap lives in docs/progress.json. This file is only a vendorable starter template kept inside _pm.",
+    "summary": "Mutable project roadmap lives in docs/progress.json. This file is only a vendorable starter template kept inside .ci/agent.",
     "rules": [
       "Copy or adapt this starter into docs/progress.json when bootstrapping a repository.",
-      "Do not treat _pm/progress.json as the live roadmap after bootstrap."
+      "Do not treat .ci/agent/progress.json as the live roadmap after bootstrap."
     ]
   },
   "workstreams": [],

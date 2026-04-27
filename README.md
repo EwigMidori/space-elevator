@@ -5,17 +5,17 @@
 
 `space-elevator` is a portable PM harness for multi-agent PDCA execution in any repository.
 
-The package ships a vendorable `_pm/` template and a small CLI that installs that template into another repository root.
+The package ships a vendorable `.ci/agent/` template and a small CLI that installs that template into another repository root.
 
 It is designed for repositories that want a durable local source of truth for roadmap state, agent rulebooks, spec-review gates, and unattended architect wakeups.
 
 ## What It Contains
 
-- A copyable `_pm/` directory template under `src/space_elevator/template/_pm/`
+- A copyable `.ci/agent/` directory template under `src/space_elevator/template/agent/`
 - A roadmap schema checker
 - A local roadmap viewer
 - `propeller.py`, an unattended architect watcher for Codex-driven execution
-- Agent rulebooks and scoring rules under `_pm/`
+- Agent rulebooks and scoring rules under `.ci/agent/`
 - A minimal live-roadmap starter for `docs/progress.json`
 
 ## Install Or Run With `uv`
@@ -48,7 +48,7 @@ Install the template into a repository root:
 PYTHONPATH=src python3 -m space_elevator.cli init .
 ```
 
-Overwrite an existing `_pm/` directory:
+Overwrite an existing installed harness:
 
 ```bash
 PYTHONPATH=src python3 -m space_elevator.cli init . --force
@@ -57,17 +57,25 @@ PYTHONPATH=src python3 -m space_elevator.cli init . --force
 Choose another destination directory name:
 
 ```bash
-PYTHONPATH=src python3 -m space_elevator.cli init . --pm-dir ops-pm
+PYTHONPATH=src python3 -m space_elevator.cli init . --pm-dir ops/agent
 ```
 
-The installer also creates `<repo-root>/.tmp/.gitignore` when it is missing.
+Refresh an existing installation in place:
+
+```bash
+PYTHONPATH=src python3 -m space_elevator.cli upgrade .
+```
+
+`upgrade` only runs against directories that contain a `space-elevator` install manifest. It preserves repo-local `.ci/agent/AGENTS.md`, `.ci/agent/progress.json`, and any extra non-template files under `.ci/agent/` while refreshing shipped files.
+
+The installer also updates `<repo-root>/.git/info/exclude` when git metadata is available.
 If `docs/progress.json` is missing, the installer also creates it from the bundled starter template.
 
 ## Consuming The Template
 
 The installed template expects:
 
-- the copied directory to live at `<repo-root>/_pm/`
+- the copied directory to live at `<repo-root>/.ci/agent/`
 - the live mutable roadmap to live at `<repo-root>/docs/progress.json`
 - active batch specs to live at `<main_worktree_root>/.tmp/`
 - local git ignore rules to permit `/.tmp/` scratch state
@@ -75,14 +83,14 @@ The installed template expects:
 Useful commands after vendoring:
 
 ```bash
-python3 _pm/scripts/check_progress_schema.py
-python3 _pm/scripts/view_progress.py
-python3 _pm/scripts/propeller.py
+python3 .ci/agent/scripts/check_progress_schema.py
+python3 .ci/agent/scripts/view_progress.py
+python3 .ci/agent/scripts/propeller.py
 ```
 
 Inside the vendored harness:
 
-- `_pm/progress.json` is only a minimal starter template kept with the harness.
+- `.ci/agent/progress.json` is only a minimal starter template kept with the harness.
 - `docs/progress.json` is the real mutable roadmap that agents should read and update.
 
 ## Repository Layout
@@ -91,7 +99,7 @@ Inside the vendored harness:
   Initialization CLI.
 - `src/space_elevator/__main__.py`
   `python -m space_elevator` entrypoint.
-- `src/space_elevator/template/_pm/`
+- `src/space_elevator/template/agent/`
   The vendorable harness template.
 - `tests/`
   Basic offline validation for the CLI installer.

@@ -42,7 +42,7 @@ space-elevator = "space_elevator.cli:main"
 [tool.hatch.build]
 include = [
   "src/space_elevator/**/*.py",
-  "src/space_elevator/template/_pm/**",
+  "src/space_elevator/template/agent/**",
   "src/space_elevator/template/docs/**",
   "README.md",
   "LICENSE",

@@ -8,15 +8,15 @@ The Test Agent is not required to add tests. Its primary responsibility is to re
 
 ## Binding References
 
-- `_pm/docs/test-agent-handbook.md`
-- `_pm/AGENTS.md`
+- `.ci/agent/docs/test-agent-handbook.md`
+- `.ci/agent/AGENTS.md`
 
 The Test Agent handbook is binding for test-design and test-rejection decisions.
 
 ## Required Behavior
 
 - decide first whether test work is justified at all
-- apply the decision gate, assertion bar, and rejection rules in `_pm/docs/test-agent-handbook.md`
+- apply the decision gate, assertion bar, and rejection rules in `.ci/agent/docs/test-agent-handbook.md`
 - reject tests that only create the appearance of coverage
 - reject test work when the system under test is visibly incomplete or unstable
 - review test code with production-level rigor
