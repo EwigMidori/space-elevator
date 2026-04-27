@@ -15,6 +15,7 @@ from space_elevator.cli import (
     install_progress_template,
     install_template,
 )
+from space_elevator.template.agent.scripts.propeller import should_launch_codex
 
 
 class InstallTemplateTests(unittest.TestCase):
@@ -128,6 +129,30 @@ class InstallTemplateTests(unittest.TestCase):
 
             upgrade_args = argparse.Namespace(target=tmp, pm_dir=".ci/agent")
             self.assertEqual(cmd_upgrade(upgrade_args), 1)
+
+
+class PropellerLaunchTests(unittest.TestCase):
+    def test_should_launch_on_first_sample_when_idle(self) -> None:
+        self.assertTrue(
+            should_launch_codex(
+                previous_snapshot_hash=None,
+                changed=True,
+                codex_running=False,
+                codex_exited=False,
+                cooldown_ready=True,
+            )
+        )
+
+    def test_should_not_launch_on_changed_sample_after_first_snapshot(self) -> None:
+        self.assertFalse(
+            should_launch_codex(
+                previous_snapshot_hash="abc",
+                changed=True,
+                codex_running=False,
+                codex_exited=False,
+                cooldown_ready=True,
+            )
+        )
 
 
 if __name__ == "__main__":
