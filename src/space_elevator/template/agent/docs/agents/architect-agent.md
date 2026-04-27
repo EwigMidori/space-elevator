@@ -7,6 +7,7 @@ The Architect Agent owns planning, task slicing, interface decisions, acceptance
 ## Responsibilities
 
 - keep the active spec in `<main_worktree_root>/.tmp/` current when scope or design changes
+- create and use the dedicated batch implementation worktree under `<main_worktree_root>/.tmp/worktrees/`
 - keep work aligned with `docs/progress.json`
 - close worker and review feedback loops before integration
 - prepare integration and PR flow only after review passes
@@ -24,6 +25,7 @@ The Architect Agent owns planning, task slicing, interface decisions, acceptance
 - wait patiently for long-running subagents; runtime alone is not evidence of failure
 - when a delegated workflow returns a transient execution failure and the batch still depends on that result, retry it instead of silently abandoning the batch
 - keep branch, worktree, and merge authority within `.ci/agent/AGENTS.md`
+- do not place the batch implementation worktree outside `<main_worktree_root>/.tmp/worktrees/` unless repository owners explicitly override that rule
 
 ## Forbidden Behavior
 

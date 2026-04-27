@@ -16,7 +16,8 @@ Its purpose is simple: prevent AI agents and developers from placing work in the
 ## Execution Workflow Source Of Truth
 
 - The detailed implementation spec for the current batch must live under `<main_worktree_root>/.tmp/`.
-- Specs live in the main worktree root on purpose so they survive temporary worktree deletion and remain auditable after integration.
+- Batch implementation worktrees must also live under `<main_worktree_root>/.tmp/worktrees/`.
+- Specs live in the main worktree root on purpose so they survive temporary worktree deletion and remain auditable after integration, while keeping the matching batch worktree under the same local-only `.tmp/` root.
 - Before starting a batch of delegated work, the Architect Agent must write an implementation spec detailed enough that a capable junior engineer could execute it without guessing.
 - That spec must pass the review gate in `.ci/agent/docs/agents/spec-review.md` before worker agents start.
 - If the Architect Agent inserts refactor work because the current architecture would degrade downstream implementation quality, that refactor batch or phase must also have its own `.tmp/` spec and must pass spec review before worker agents start.
@@ -73,6 +74,7 @@ This repository uses a feedback-driven PDCA workflow for substantial implementat
 
 - The repository default branch is protected. Do not push directly to it.
 - Do not implement, edit, or stage substantial changes in the default-branch worktree. Implementation work must happen in a dedicated `git worktree` attached to a non-default batch branch.
+- Create that batch worktree under `<main_worktree_root>/.tmp/worktrees/`, for example `git worktree add <main_worktree_root>/.tmp/worktrees/<batch-id> <branch>`.
 - Subagents have no authority to commit, amend commits, push branches, or create PRs.
 - Only the Architect Agent may prepare the final integrated branch state and create the PR. When the active prompt explicitly instructs the Architect Agent to advance all assigned tasks through completion, the Architect Agent may also merge the PR after review passes.
 - If intermediate git operations are required, subagents must leave changes in their workspace and report them back; they must not create commits themselves.
@@ -158,7 +160,7 @@ smoke tests
 
 - Document why a design exists, not only what the code already says.
 - Durable PM rules live in `.ci/agent/`.
-- Active specs, temporary planning material, local research, and scratch copies live under `<main_worktree_root>/.tmp/`.
+- Active specs, temporary planning material, local research, scratch copies, and dedicated batch worktrees live under `<main_worktree_root>/.tmp/`.
 - `.tmp/` should be locally ignored from git tracking.
 - When code changes alter roadmap assumptions or delivery sequencing, update `docs/progress.json` together with the implementation.
 
